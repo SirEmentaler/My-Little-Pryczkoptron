@@ -30,6 +30,8 @@
 #include <numeric>
 #include <vector>
 
+namespace mlp {
+
 /// Template class representing a single neuron of a perceptron
 /**
 	TODO: Detailed description
@@ -96,6 +98,8 @@ template<class Generator>
 void Neuron<T>::generateParameters(Generator gen) {
 	bias = gen();
 	std::generate(weights.begin(), weights.end(), gen);
+}
+
 }
 
 #endif

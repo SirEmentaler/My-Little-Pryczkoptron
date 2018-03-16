@@ -28,6 +28,8 @@
 #include <chrono>
 #include <random>
 
+namespace mlp {
+
 /// Template class representing a pseudo-random real number generator
 /**
 	TODO: Detailed description
@@ -64,6 +66,8 @@ RandomNumberGenerator<T, U>::RandomNumberGenerator(T min, T max)
 template<typename T, class U>
 T RandomNumberGenerator<T, U>::operator()() {
 	return distribution(generator);
+}
+
 }
 
 #endif

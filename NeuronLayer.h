@@ -31,6 +31,8 @@
 #include <vector>
 #include "Neuron.h"
 
+namespace mlp {
+
 /// Template class representing one layer of neurons
 /**
 	TODO: Detailed description
@@ -122,6 +124,8 @@ void NeuronLayer<T>::generateParameters(Generator gen) {
 	auto generate = &Neuron::template generateParameters<Generator>;
 	auto operation = std::bind(generate, _1, gen);
 	std::for_each(neurons.begin(), neurons.end(), operation);
+}
+
 }
 
 #endif

@@ -13,11 +13,11 @@ double identity(double x) {
 }
 
 int main() {
-	MultiLayerPerceptron<double> network(1, {
+	mlp::MultiLayerPerceptron<double> network(1, {
 		std::make_pair(20, sigmoid),
 		std::make_pair(1, identity),
 	});
-	RandomNumberGenerator<double, std::mt19937_64> generator(-8.0, 8.0);
+	mlp::RandomNumberGenerator<double, std::mt19937_64> generator(-8.0, 8.0);
 	network.generateParameters(generator);
 	double input;
 	double output;

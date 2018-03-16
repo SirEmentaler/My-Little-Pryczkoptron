@@ -33,6 +33,8 @@
 #include <vector>
 #include "NeuronLayer.h"
 
+namespace mlp {
+
 /// Template class representing a multilayer perceptron
 /**
 	TODO: Detailed description
@@ -160,6 +162,8 @@ void MultiLayerPerceptron<T>::construct(std::size_t inputSize, InputIt first, In
 		layers.emplace_back(size, inputSize, std::get<1>(tuple));
 		inputSize = size;
 	});
+}
+
 }
 
 #endif
