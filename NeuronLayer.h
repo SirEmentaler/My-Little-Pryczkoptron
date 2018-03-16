@@ -51,7 +51,7 @@ public:
 	using Neuron = Neuron<T>;
 	/// Constructs the neuron layer
 	template<class Function>
-	NeuronLayer(std::size_t size, std::size_t inputSize, Function activation);
+	NeuronLayer(std::size_t size, std::size_t inputSize, Function activation, Function derivative);
 	/// Obtains number of neurons in the layer
 	std::size_t size() const;
 	/// Produces output based on provided input data
@@ -63,6 +63,7 @@ public:
 private:
 	std::vector<Neuron> neurons;
 	std::function<T(T)> activation;
+	std::function<T(T)> derivative;
 };
 
 /**
@@ -73,11 +74,12 @@ private:
 	@param[in] size       Number of neurons in the layer
 	@param[in] inputSize  Number of inputs to the layer
 	@param[in] activation Activation function used by the layer
+	@param[in] derivative Derivative of the activation function
 */
 template<typename T>
 template<class Function>
-NeuronLayer<T>::NeuronLayer(std::size_t size, std::size_t inputSize, Function activation)
-	: neurons(size, Neuron(inputSize)), activation(activation) {}
+NeuronLayer<T>::NeuronLayer(std::size_t size, std::size_t inputSize, Function activation, Function derivative)
+	: neurons(size, Neuron(inputSize)), activation(activation), derivative(derivative) {}
 
 /**
 	@returns Size of the layer, i.e. number of neurons it contains

@@ -80,7 +80,7 @@ private:
 
 	@tparam    InputIt   Must meet the requirements of `InputIterator`
 	                     and dereference to a tuple-like type  with at least
-	                     2 elements that supports `std::get`
+	                     3 elements that supports `std::get`
 	@param[in] inputSize Number of inputs of the perceptron
 	@param[in] first     The beginning of the layer specification range
 	@param[in] last      The end of the layer specification range
@@ -98,7 +98,7 @@ MultiLayerPerceptron<T>::MultiLayerPerceptron(std::size_t inputSize, InputIt fir
 	and the second object specifies its activation function. The number of layers
 	created will be equal to `init.size()`.
 
-	@tparam    TupleType Must be tuple-like type with at least 2 elements
+	@tparam    TupleType Must be tuple-like type with at least 3 elements
 	                     and support `std::get`
 	@param[in] inputSize Number of inputs of the perceptron
 	@param[in] init      Initializer list containing layer specifications
@@ -174,7 +174,7 @@ template<class InputIt>
 void MultiLayerPerceptron<T>::construct(std::size_t inputSize, InputIt first, InputIt last) {
 	std::for_each(first, last, [&](const auto& tuple) {
 		std::size_t size = std::get<0>(tuple);
-		layers.emplace_back(size, inputSize, std::get<1>(tuple));
+		layers.emplace_back(size, inputSize, std::get<1>(tuple), std::get<2>(tuple));
 		inputSize = size;
 	});
 }
