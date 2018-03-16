@@ -34,7 +34,13 @@ namespace mlp {
 
 /// Template class representing a single neuron of a perceptron
 /**
-	TODO: Detailed description
+	Each neuron stores an array of weights assigned to its inputs as well
+	as a single bias. The key functionality of a neuron is returning its
+	activation for given inputs via `Neuron::stimulate`.
+
+	@tparam T Must meet the requirements of `NumericType` and for objects
+	          `a, b` of type `T`, the expressions `a + b` and `a * b` must
+	          be well-formed and be of type assignable to T.
 */
 template<typename T>
 class Neuron {

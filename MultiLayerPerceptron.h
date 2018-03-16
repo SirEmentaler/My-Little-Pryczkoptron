@@ -37,7 +37,12 @@ namespace mlp {
 
 /// Template class representing a multilayer perceptron
 /**
-	TODO: Detailed description
+	A multilayer perceptron is a neural network consisting of some number
+	of neuron layers.
+
+	@tparam T Must meet the requirements of `NumericType` and for objects
+	          `a, b` of type `T`, the expressions `a + b` and `a * b` must
+	          be well-formed and be of type assignable to T.
 */
 template<typename T>
 class MultiLayerPerceptron {
@@ -67,12 +72,18 @@ private:
 };
 
 /**
-	TODO: Detailed description
+	The range `[first, last)` should contain specifications of neuron layers
+	to be created within the perceptron. Each element of the range should
+	be an ordered pair where the first object specifies the size of a layer
+	and the second object specifies its activation function. The number of layers
+	created will be equal to `std::distance(first, last)`.
 
 	@tparam    InputIt   Must meet the requirements of `InputIterator`
+	                     and dereference to a tuple-like type  with at least
+	                     2 elements that supports `std::get`
 	@param[in] inputSize Number of inputs of the perceptron
-	@param[in] first     The beginning of the input range
-	@param[in] last      The end of the input range
+	@param[in] first     The beginning of the layer specification range
+	@param[in] last      The end of the layer specification range
 */
 template<typename T>
 template<class InputIt>
@@ -81,7 +92,11 @@ MultiLayerPerceptron<T>::MultiLayerPerceptron(std::size_t inputSize, InputIt fir
 }
 
 /**
-	TODO: Detailed description
+	The initializer list should contain specifications of neuron layers
+	to be created within the perceptron. Each element of the range should
+	be an ordered pair where the first object specifies the size of a layer
+	and the second object specifies its activation function. The number of layers
+	created will be equal to `init.size()`.
 
 	@tparam    TupleType Must be tuple-like type with at least 2 elements
 	                     and support `std::get`

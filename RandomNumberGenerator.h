@@ -32,7 +32,8 @@ namespace mlp {
 
 /// Template class representing a pseudo-random real number generator
 /**
-	TODO: Detailed description
+	Objects of this class are capable of generating uniformly distributed
+	real numbers from a provided range.
 */
 template<typename T, class UnderlyingType>
 class RandomNumberGenerator {

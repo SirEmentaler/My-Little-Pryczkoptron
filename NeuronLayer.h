@@ -35,7 +35,12 @@ namespace mlp {
 
 /// Template class representing one layer of neurons
 /**
-	TODO: Detailed description
+	A neuron layer stores some number of neurons, as well as an activation
+	function used collectively for all of them.
+
+	@tparam T Must meet the requirements of `NumericType` and for objects
+	          `a, b` of type `T`, the expressions `a + b` and `a * b` must
+	          be well-formed and be of type assignable to T.
 */
 template<typename T>
 class NeuronLayer {
@@ -61,8 +66,6 @@ private:
 };
 
 /**
-	TODO: Detailed description
-
 	@tparam    Function   An invokable type with signature equivalent to
 	                      `Ret f(Arg)`, such that a value of type `Ret` may
 	                      be assigned to a variable of type `T` and `T` is
