@@ -60,8 +60,8 @@ public:
 	/// Obtains number of layers of the perceptron
 	std::size_t size() const;
 	/// Produces neural network output based on provided input data
-	template<class BidirIt, class OutputIt>
-	void test(BidirIt first, BidirIt last, OutputIt out) const;
+	template<class ForwardIt, class OutputIt>
+	void test(ForwardIt first, ForwardIt last, OutputIt out) const;
 	/// Generates biases and weights of neurons
 	template<class Generator>
 	void generateParameters(Generator gen);
@@ -125,15 +125,15 @@ std::size_t MultiLayerPerceptron<T>::size() const {
 	The size of `[first, last)` must match exactly the input size expected
 	by the perceptron, otherwise the behavior is undefined.
 
-	@tparam     BidirIt  Must meet the requirements of `BidirectionalIterator`
-	@tparam     OutputIt Must meet the requirements of `OutputIterator`
-	@param[in]  first    The beginning of the input range
-	@param[in]  last     The end of the input range
-	@param[out] out      The beginning of the destination range
+	@tparam     ForwardIt Must meet the requirements of `ForwardIterator`
+	@tparam     OutputIt  Must meet the requirements of `OutputIterator`
+	@param[in]  first     The beginning of the input range
+	@param[in]  last      The end of the input range
+	@param[out] out       The beginning of the destination range
 */
 template<typename T>
-template<class BidirIt, class OutputIt>
-void MultiLayerPerceptron<T>::test(BidirIt first, BidirIt last, OutputIt out) const {
+template<class ForwardIt, class OutputIt>
+void MultiLayerPerceptron<T>::test(ForwardIt first, ForwardIt last, OutputIt out) const {
 	if (size() == 0) {
 		std::copy(first, last, out);
 	} else if (size() == 1) {
