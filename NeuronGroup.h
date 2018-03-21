@@ -55,11 +55,12 @@ public:
 	std::size_t size() const;
 	/// Produces output based on provided input data
 	template<class ForwardIt, class OutputIt>
-	void process(ForwardIt first, ForwardIt last, OutputIt out) const;
+	void process(ForwardIt first, OutputIt out) const;
 	/// Generates biases and weights of neurons
 	template<class Generator>
 	void generateParameters(Generator gen);
 private:
+	std::size_t inputSize;
 	std::vector<Neuron> neurons;
 };
 
@@ -73,7 +74,7 @@ private:
 */
 template<typename T>
 NeuronGroup<T>::NeuronGroup(std::size_t size, std::size_t inputSize)
-	: neurons(size, Neuron(inputSize)) {}
+	: inputSize(inputSize), neurons(size, Neuron(inputSize)) {}
 
 /**
 	@returns Size of the layer, i.e. number of neurons it contains
@@ -84,23 +85,21 @@ std::size_t NeuronGroup<T>::size() const {
 }
 
 /**
-	Interprets the range `[first, last)` as neuron layer input and forwards
-	it to the neurons. The output of is then placed in the range beginning
-	at `out`.
-
-	The size of `[first, last)` must match exactly the input size expected
-	by the layer, otherwise the behavior is undefined.
+	Interprets the range `[first, first + inputSize)` as neuron layer input
+	and forwards it to the neurons. The output of is then placed in the range
+	beginning at `out`.
 
 	@tparam     ForwardIt Must meet the requirements of `ForwardIterator`
 	@tparam     OutputIt  Must meet the requirements of `OutputIterator`
 	@param[in]  first     The beginning of the input range
-	@param[in]  last      The end of the input range
 	@param[out] out       The beginning of the destination range
 */
 template<typename T>
 template<class ForwardIt, class OutputIt>
-void NeuronGroup<T>::process(ForwardIt first, ForwardIt last, OutputIt out) const {
+void NeuronGroup<T>::process(ForwardIt first, OutputIt out) const {
 	using namespace std::placeholders;
+	ForwardIt last = first;
+	std::advance(last, inputSize);
 	auto stimulate = &Neuron::template stimulate<ForwardIt>;
 	auto operation = std::bind(stimulate, _1, first, last);
 	std::transform(neurons.begin(), neurons.end(), out, operation);

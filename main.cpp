@@ -16,7 +16,7 @@ int main() {
 	double output;
 	for (int i = -10; i < 10; i++) {
 		input = i;
-		network.test(&input, &input + 1, &output);
+		network.test(&input, &output);
 		std::cout << i << ':' << output << std::endl;
 	}
 	return 0;

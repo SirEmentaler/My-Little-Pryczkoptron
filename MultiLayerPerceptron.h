@@ -59,13 +59,14 @@ public:
 	std::size_t size() const;
 	/// Produces neural network output based on provided input data
 	template<class ForwardIt, class OutputIt>
-	void test(ForwardIt first, ForwardIt last, OutputIt out) const;
+	void test(ForwardIt first, OutputIt out) const;
 	/// Generates biases and weights of neurons
 	template<class Generator>
 	void generateParameters(Generator gen);
 private:
 	template<class InputIt>
 	void construct(std::size_t inputSize, InputIt first, InputIt last);
+	std::size_t inputSize;
 	std::vector<NeuronLayer<T>> layers;
 };
 
@@ -115,43 +116,39 @@ std::size_t MultiLayerPerceptron<T>::size() const {
 }
 
 /**
-	Interprets the range `[first, last)` as perceptron input and feeds it
-	to the neural network. The output of the final layer is then placed in
-	the range beginning at `out`.
-
-	The size of `[first, last)` must match exactly the input size expected
-	by the perceptron, otherwise the behavior is undefined.
+	Interprets the range `[first, first + inputSize)` as perceptron input and
+	feeds it to the neural network. The output of the final layer is then
+	placed in the range beginning at `out`.
 
 	@tparam     ForwardIt Must meet the requirements of `ForwardIterator`
 	@tparam     OutputIt  Must meet the requirements of `OutputIterator`
 	@param[in]  first     The beginning of the input range
-	@param[in]  last      The end of the input range
 	@param[out] out       The beginning of the destination range
 */
 template<typename T>
 template<class ForwardIt, class OutputIt>
-void MultiLayerPerceptron<T>::test(ForwardIt first, ForwardIt last, OutputIt out) const {
+void MultiLayerPerceptron<T>::test(ForwardIt first, OutputIt out) const {
 	if (size() == 0) {
-		std::copy(first, last, out);
+		std::copy_n(first, inputSize, out);
 	} else if (size() == 1) {
-		layers.front().group.process(first, last, out);
+		layers.front().group.process(first, out);
 		// TODO
 	} else {
 		std::vector<T> inter(layers.front().group.size());
-		layers.front().group.process(first, last, inter.begin());
+		layers.front().group.process(first, inter.begin());
 		using namespace std::placeholders;
 		auto transformation = std::bind(ActivationFunction<T>::operator(), layers.front().activation, _1);
 		std::transform(inter.begin(), inter.end(), inter.begin(), transformation);
 		auto operation = [&](const NeuronLayer<T>& layer) {
 			std::vector<T> buffer(layer.group.size());
-			layer.group.process(inter.begin(), inter.end(), buffer.begin());
+			layer.group.process(inter.begin(), buffer.begin());
 			using namespace std::placeholders;
 			auto transformation = std::bind(ActivationFunction<T>::operator(), layer.activation, _1);
 			std::transform(buffer.begin(), buffer.end(), buffer.begin(), transformation);
 			inter = std::move(buffer);
 		};
 		std::for_each(std::next(layers.begin()), std::prev(layers.end()), operation);
-		layers.back().group.process(inter.begin(), inter.end(), out);
+		layers.back().group.process(inter.begin(), out);
 	}
 }
 
@@ -175,6 +172,7 @@ void MultiLayerPerceptron<T>::generateParameters(Generator gen) {
 template<typename T>
 template<class InputIt>
 void MultiLayerPerceptron<T>::construct(std::size_t inputSize, InputIt first, InputIt last) {
+	this->inputSize = inputSize;
 	std::for_each(first, last, [&](const NeuronLayerSpecification<T>& spec) {
 		layers.emplace_back(NeuronLayer<T>{NeuronGroup<T>(spec.size, inputSize), spec.activation});
 		inputSize = spec.size;
