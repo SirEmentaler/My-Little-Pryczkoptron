@@ -130,9 +130,6 @@ template<class ForwardIt, class OutputIt>
 void MultiLayerPerceptron<T>::test(ForwardIt first, OutputIt out) const {
 	if (size() == 0) {
 		std::copy_n(first, inputSize, out);
-	} else if (size() == 1) {
-		layers.front().group.process(first, out);
-		// TODO
 	} else {
 		std::vector<T> inter(layers.front().group.size());
 		layers.front().group.process(first, inter.begin());
@@ -147,8 +144,8 @@ void MultiLayerPerceptron<T>::test(ForwardIt first, OutputIt out) const {
 			std::transform(buffer.begin(), buffer.end(), buffer.begin(), transformation);
 			inter = std::move(buffer);
 		};
-		std::for_each(std::next(layers.begin()), std::prev(layers.end()), operation);
-		layers.back().group.process(inter.begin(), out);
+		std::for_each(std::next(layers.begin()), layers.end(), operation);
+		std::copy(inter.begin(), inter.end(), out);
 	}
 }
 
