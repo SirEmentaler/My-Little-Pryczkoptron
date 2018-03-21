@@ -31,6 +31,7 @@
 #include <tuple>
 #include <utility>
 #include <vector>
+#include "NeuronLayerSpecification.h"
 #include "NeuronLayer.h"
 
 namespace mlp {
@@ -49,14 +50,11 @@ class MultiLayerPerceptron {
 public:
 	/// Data type the class operates on
 	using ValueType = T;
-	/// Layer type
-	using Layer = NeuronLayer<T>;
 	/// Constructs the perceptron from range
 	template<class InputIt>
 	MultiLayerPerceptron(std::size_t inputSize, InputIt first, InputIt last);
 	/// Constructs the perceptron from initializer list
-	template<class TupleType>
-	MultiLayerPerceptron(std::size_t inputSize, std::initializer_list<TupleType> init);
+	MultiLayerPerceptron(std::size_t inputSize, std::initializer_list<NeuronLayerSpecification<T>> init);
 	/// Obtains number of layers of the perceptron
 	std::size_t size() const;
 	/// Produces neural network output based on provided input data
@@ -68,7 +66,7 @@ public:
 private:
 	template<class InputIt>
 	void construct(std::size_t inputSize, InputIt first, InputIt last);
-	std::vector<Layer> layers;
+	std::vector<NeuronLayer<T>> layers;
 };
 
 /**
@@ -104,8 +102,7 @@ MultiLayerPerceptron<T>::MultiLayerPerceptron(std::size_t inputSize, InputIt fir
 	@param[in] init      Initializer list containing layer specifications
 */
 template<typename T>
-template<class TupleType>
-MultiLayerPerceptron<T>::MultiLayerPerceptron(std::size_t inputSize, std::initializer_list<TupleType> init) {
+MultiLayerPerceptron<T>::MultiLayerPerceptron(std::size_t inputSize, std::initializer_list<NeuronLayerSpecification<T>> init) {
 	construct(inputSize, init.begin(), init.end());
 }
 
@@ -137,17 +134,24 @@ void MultiLayerPerceptron<T>::test(ForwardIt first, ForwardIt last, OutputIt out
 	if (size() == 0) {
 		std::copy(first, last, out);
 	} else if (size() == 1) {
-		layers.front().process(first, last, out);
+		layers.front().group.process(first, last, out);
+		// TODO
 	} else {
-		std::vector<T> inter(layers.front().size());
-		layers.front().process(first, last, inter.begin());
-		auto operation = [&](const Layer& layer) {
-			std::vector<T> buffer(layer.size());
-			layer.process(inter.begin(), inter.end(), buffer.begin());
+		std::vector<T> inter(layers.front().group.size());
+		layers.front().group.process(first, last, inter.begin());
+		using namespace std::placeholders;
+		auto transformation = std::bind(ActivationFunction<T>::operator(), layers.front().activation, _1);
+		std::transform(inter.begin(), inter.end(), inter.begin(), transformation);
+		auto operation = [&](const NeuronLayer<T>& layer) {
+			std::vector<T> buffer(layer.group.size());
+			layer.group.process(inter.begin(), inter.end(), buffer.begin());
+			using namespace std::placeholders;
+			auto transformation = std::bind(ActivationFunction<T>::operator(), layer.activation, _1);
+			std::transform(buffer.begin(), buffer.end(), buffer.begin(), transformation);
 			inter = std::move(buffer);
 		};
 		std::for_each(std::next(layers.begin()), std::prev(layers.end()), operation);
-		layers.back().process(inter.begin(), inter.end(), out);
+		layers.back().group.process(inter.begin(), inter.end(), out);
 	}
 }
 
@@ -163,19 +167,17 @@ void MultiLayerPerceptron<T>::test(ForwardIt first, ForwardIt last, OutputIt out
 template<typename T>
 template<class Generator>
 void MultiLayerPerceptron<T>::generateParameters(Generator gen) {
-	using namespace std::placeholders;
-	auto generate = &Layer::template generateParameters<Generator>;
-	auto operation = std::bind(generate, _1, gen);
-	std::for_each(layers.begin(), layers.end(), operation);
+	for (auto&& layer : layers) {
+		layer.group.generateParameters(gen);
+	}
 }
 
 template<typename T>
 template<class InputIt>
 void MultiLayerPerceptron<T>::construct(std::size_t inputSize, InputIt first, InputIt last) {
-	std::for_each(first, last, [&](const auto& tuple) {
-		std::size_t size = std::get<0>(tuple);
-		layers.emplace_back(size, inputSize, std::get<1>(tuple), std::get<2>(tuple));
-		inputSize = size;
+	std::for_each(first, last, [&](const NeuronLayerSpecification<T>& spec) {
+		layers.emplace_back(NeuronLayer<T>{NeuronGroup<T>(spec.size, inputSize), spec.activation});
+		inputSize = spec.size;
 	});
 }
 

@@ -22,35 +22,35 @@
 //
 ////////////////////////////////////////////////////////////
 
-#ifndef NEURON_LAYER_H_
-#define NEURON_LAYER_H_
+#ifndef NEURON_LAYER_SPECIFICATION_H_
+#define NEURON_LAYER_SPECIFICATION_H_
 
-#include "NeuronGroup.h"
+#include <cstddef>
+#include <memory>
 #include "ActivationFunction.h"
 
 namespace mlp {
 
-/// Template structure representing a neuron layer with activation function
+/// Template structure representing a neuron layer specification
 /**
-	A neuron layer stores a group of neurons, as well as an activation
-	function used collectively for all of them.
+	A neuron layer specification is sufficient to construct a neuron layer.
+	It contains the size of the layer and its activation function.
 
 	@tparam T Must meet the requirements of `NumericType` and for objects
 	          `a, b` of type `T`, the expressions `a + b` and `a * b` must
 	          be well-formed and be of type assignable to T.
 */
 template<typename T>
-struct NeuronLayer {
+struct NeuronLayerSpecification {
 	/// Data type the class operates on
 	using ValueType = T;
-	/// The group of neurons
-	NeuronGroup<T> group;
-	/// The activation function
+	/// Size of the layer, i.e. its number of neurons
+	std::size_t size;
+	/// Activation function of the layer
 	std::shared_ptr<ActivationFunction<T>> activation;
 };
 
 }
 
 #endif
-
 

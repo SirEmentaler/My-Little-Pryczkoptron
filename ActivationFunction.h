@@ -22,35 +22,30 @@
 //
 ////////////////////////////////////////////////////////////
 
-#ifndef NEURON_LAYER_H_
-#define NEURON_LAYER_H_
-
-#include "NeuronGroup.h"
-#include "ActivationFunction.h"
+#ifndef ACTIVATION_FUNCTION_H_
+#define ACTIVATION_FUNCTION_H_
 
 namespace mlp {
 
-/// Template structure representing a neuron layer with activation function
+/// Template abstract class representing an activation function with derivative
 /**
-	A neuron layer stores a group of neurons, as well as an activation
-	function used collectively for all of them.
+	An activation function is used by neuron layers.
 
-	@tparam T Must meet the requirements of `NumericType` and for objects
-	          `a, b` of type `T`, the expressions `a + b` and `a * b` must
-	          be well-formed and be of type assignable to T.
+	@tparam T Any copyable type
 */
 template<typename T>
-struct NeuronLayer {
+class ActivationFunction {
+public:
 	/// Data type the class operates on
 	using ValueType = T;
-	/// The group of neurons
-	NeuronGroup<T> group;
-	/// The activation function
-	std::shared_ptr<ActivationFunction<T>> activation;
+	/// Default virtual destructor
+	virtual ~ActivationFunction() = default;
+	/// Calls the function and returns a value
+	virtual T operator()(T) const = 0;
+	/// Calls the derivative of the function and returns a value
+	virtual T derivative(T) const = 0;
 };
 
 }
 
 #endif
-
-

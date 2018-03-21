@@ -22,35 +22,52 @@
 //
 ////////////////////////////////////////////////////////////
 
-#ifndef NEURON_LAYER_H_
-#define NEURON_LAYER_H_
+#ifndef LOGISTIC_FUNCTION_H_
+#define LOGISTIC_FUNCTION_H_
 
-#include "NeuronGroup.h"
+#include <cmath>
 #include "ActivationFunction.h"
 
 namespace mlp {
 
-/// Template structure representing a neuron layer with activation function
+/// Template class representing a sigmoid activation function
 /**
-	A neuron layer stores a group of neurons, as well as an activation
-	function used collectively for all of them.
+	Activation function @f$ f(x) = \frac{1}{1+\exp(-x)} @f$ .
 
-	@tparam T Must meet the requirements of `NumericType` and for objects
-	          `a, b` of type `T`, the expressions `a + b` and `a * b` must
-	          be well-formed and be of type assignable to T.
+	@tparam T Must meet the requirements of `NumericType` and for a variable
+	          `x` of type `T`, the expression `std::exp(x)` must be well formed
 */
 template<typename T>
-struct NeuronLayer {
-	/// Data type the class operates on
-	using ValueType = T;
-	/// The group of neurons
-	NeuronGroup<T> group;
-	/// The activation function
-	std::shared_ptr<ActivationFunction<T>> activation;
+class LogisticFunction : public ActivationFunction<T> {
+	/// Returns logistic function value
+	T operator()(T x) const override;
+	/// Returns logistic function derivative value
+	T derivative(T x) const override;
 };
+
+/**
+	@param[in] x Function argument
+
+	@returns Function value @f$ f(x) = \frac{1}{1+\exp(-x)} @f$ .
+*/
+template<typename T>
+T LogisticFunction<T>::operator()(T x) const {
+	return T(1) / (T(1) + std::exp(-x));
+}
+
+/**
+	@param[in] x Function argument
+
+	@returns Function value @f$ f(x) = \frac{\exp(x)}{(1+\exp(-x))^2} @f$ .
+*/
+template<typename T>
+T LogisticFunction<T>::derivative(T x) const {
+	double e = std::exp(x);
+	double e1 = e + T(1);
+	return e / (e1 * e1);
+}
 
 }
 
 #endif
-
 

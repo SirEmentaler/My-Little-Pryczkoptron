@@ -22,35 +22,47 @@
 //
 ////////////////////////////////////////////////////////////
 
-#ifndef NEURON_LAYER_H_
-#define NEURON_LAYER_H_
+#ifndef IDENTITY_FUNCTION_H_
+#define IDENTITY_FUNCTION_H_
 
-#include "NeuronGroup.h"
 #include "ActivationFunction.h"
 
 namespace mlp {
 
-/// Template structure representing a neuron layer with activation function
+/// Template class representing a linear activation function
 /**
-	A neuron layer stores a group of neurons, as well as an activation
-	function used collectively for all of them.
+	Activation function @f$ f(x) = x @f$ .
 
-	@tparam T Must meet the requirements of `NumericType` and for objects
-	          `a, b` of type `T`, the expressions `a + b` and `a * b` must
-	          be well-formed and be of type assignable to T.
+	@tparam T Must meet the requirements of `NumericType`
 */
 template<typename T>
-struct NeuronLayer {
-	/// Data type the class operates on
-	using ValueType = T;
-	/// The group of neurons
-	NeuronGroup<T> group;
-	/// The activation function
-	std::shared_ptr<ActivationFunction<T>> activation;
+class IdentityFunction : public ActivationFunction<T> {
+	/// Returns its argument
+	T operator()(T x) const override;
+	/// Returns 1
+	T derivative(T) const override;
 };
+
+/**
+	@param[in] x Function argument
+
+	@returns Function value @f$ f(x) = x @f$ .
+*/
+template<typename T>
+T IdentityFunction<T>::operator()(T x) const {
+	return x;
+}
+
+/**
+	@param[in] Function argument
+
+	@returns Function value @f$ f^\prime(x) = 1 @f$ .
+*/
+template<typename T>
+T IdentityFunction<T>::derivative(T) const {
+	return T(1);
+}
 
 }
 
 #endif
-
-
