@@ -29,6 +29,7 @@
 #include <cstddef>
 #include <functional>
 #include <vector>
+#include "ActivationFunction.h"
 #include "Neuron.h"
 
 namespace mlp {
@@ -53,14 +54,19 @@ public:
 	NeuronGroup(std::size_t size, std::size_t inputSize);
 	/// Obtains number of neurons in the layer
 	std::size_t size() const;
+	/// Obtains size of layer input
+	std::size_t inputSize() const;
 	/// Produces output based on provided input data
 	template<class ForwardIt, class OutputIt>
 	void process(ForwardIt first, OutputIt out) const;
+	/// TODO
+	template<class InputIt1, class InputIt2, class ForwardIt1, class ForwardIt2>
+	void modify(const ActivationFunction<T>& activation, InputIt1 sums, InputIt2 expected, ForwardIt1 args, T step, ForwardIt2 out);
 	/// Generates biases and weights of neurons
 	template<class Generator>
 	void generateParameters(Generator gen);
 private:
-	std::size_t inputSize;
+	std::size_t inSize;
 	std::vector<Neuron> neurons;
 };
 
@@ -74,7 +80,7 @@ private:
 */
 template<typename T>
 NeuronGroup<T>::NeuronGroup(std::size_t size, std::size_t inputSize)
-	: inputSize(inputSize), neurons(size, Neuron(inputSize)) {}
+	: inSize(inputSize), neurons(size, Neuron(inputSize)) {}
 
 /**
 	@returns Size of the layer, i.e. number of neurons it contains
@@ -82,6 +88,14 @@ NeuronGroup<T>::NeuronGroup(std::size_t size, std::size_t inputSize)
 template<typename T>
 std::size_t NeuronGroup<T>::size() const {
 	return neurons.size();
+}
+
+/**
+	@returns Size of the expected input
+*/
+template<typename T>
+std::size_t NeuronGroup<T>::inputSize() const {
+	return inSize;
 }
 
 /**
@@ -98,11 +112,24 @@ template<typename T>
 template<class ForwardIt, class OutputIt>
 void NeuronGroup<T>::process(ForwardIt first, OutputIt out) const {
 	using namespace std::placeholders;
-	ForwardIt last = first;
-	std::advance(last, inputSize);
 	auto stimulate = &Neuron::template stimulate<ForwardIt>;
-	auto operation = std::bind(stimulate, _1, first, last);
+	auto operation = std::bind(stimulate, _1, first);
 	std::transform(neurons.begin(), neurons.end(), out, operation);
+}
+
+/**
+	TODO
+*/
+template<typename T>
+template<class InputIt1, class InputIt2, class ForwardIt1, class ForwardIt2>
+// TODO: Take derivative argument instead of expected argument
+void NeuronGroup<T>::modify(const ActivationFunction<T>& activation, InputIt1 sums, InputIt2 expected, ForwardIt1 args, T step, ForwardIt2 out) {
+	for (auto&& neuron : neurons) {
+		T sum = *sums++;
+		T exp = *expected++;
+		T factor = (activation(sum) - exp) * activation.derivative(sum);
+		neuron.nudge(args, factor * step, out);
+	}
 }
 
 /**

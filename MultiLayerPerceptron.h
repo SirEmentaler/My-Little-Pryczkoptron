@@ -60,6 +60,9 @@ public:
 	/// Produces neural network output based on provided input data
 	template<class ForwardIt, class OutputIt>
 	void test(ForwardIt first, OutputIt out) const;
+	/// Trains neural network based on provided input data and expected output
+	template<class InputIt1, class InputIt2>
+	void train(InputIt1 first, InputIt2 expected, T step);
 	/// Generates biases and weights of neurons
 	template<class Generator>
 	void generateParameters(Generator gen);
@@ -146,6 +149,66 @@ void MultiLayerPerceptron<T>::test(ForwardIt first, OutputIt out) const {
 		};
 		std::for_each(std::next(layers.begin()), layers.end(), operation);
 		std::copy(inter.begin(), inter.end(), out);
+	}
+}
+
+/**
+	Interprets the range `[first, first + inputSize)` as perceptron input and
+	feeds it to the neural network. Interprets the range
+	`[expected, expected + outputSize)` as expected results of the operation
+	and corrects weights and biases based on it.
+
+	@tparam    InputIt1 Must meet the requirements of `ForwardIterator`
+	@tparam    InputIt2 Must meet the requirements of `InputIterator`
+	@param[in] first    The beginning of the input range
+	@param[in] expected The beginning of the expected output range
+*/
+template<typename T>
+template<class InputIt1, class InputIt2>
+void MultiLayerPerceptron<T>::train(InputIt1 first, InputIt2 expected, T step) {
+	if (size() != 0) {
+		// TODO
+		std::vector<std::vector<T>> sums;
+		std::vector<std::vector<T>> activeSums;
+		sums.reserve(size() + 1);
+		sums.emplace_back(inputSize);
+		activeSums.reserve(size() + 1);
+		activeSums.emplace_back(inputSize);
+		std::copy_n(first, inputSize, sums.front().begin());
+		std::copy_n(sums.front().begin(), inputSize, activeSums.front().begin());
+		auto operation = [&](const NeuronLayer<T>& layer) {
+			std::vector<T> buffer(layer.group.size());
+			layer.group.process(activeSums.back().begin(), buffer.begin());
+			sums.emplace_back(buffer);
+			using namespace std::placeholders;
+			auto transformation = std::bind(ActivationFunction<T>::operator(), layer.activation, _1);
+			std::transform(buffer.begin(), buffer.end(), buffer.begin(), transformation);
+			activeSums.emplace_back(std::move(buffer));
+		};
+		std::for_each(layers.begin(), layers.end(), operation);
+		auto sumIt = sums.rbegin();
+		auto layerIt = layers.rbegin();
+		auto activeSumIt = activeSums.rbegin();
+		auto& last = *sumIt++;
+		std::vector<T> nudges(sumIt->size());
+		layerIt->group.modify(*layerIt->activation, last.begin(), expected, sumIt->begin(), step, nudges.begin());
+		T layerSize = layerIt->group.size();
+		std::transform(nudges.begin(), nudges.end(), nudges.begin(), [=](T value) {
+			return value / layerSize;
+		});
+		for (++layerIt, ++activeSumIt; layerIt != layers.rend(); ++layerIt, ++activeSumIt) {
+			auto& last = *sumIt++;
+			std::vector<T> buffer(sumIt->size());
+			std::transform(nudges.begin(), nudges.end(), activeSumIt->begin(), nudges.begin(), [](T nudge, T sum) {
+				return nudge + sum;
+			});
+			layerIt->group.modify(*layerIt->activation, last.begin(), nudges.begin(), sumIt->begin(), step, nudges.begin());
+			T layerSize = layerIt->group.size();
+			std::transform(buffer.begin(), buffer.end(), buffer.begin(), [=](T value) {
+				return value / layerSize;
+			});
+			nudges = std::move(buffer);
+		}
 	}
 }
 

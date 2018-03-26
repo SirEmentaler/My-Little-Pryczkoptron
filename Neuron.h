@@ -51,7 +51,10 @@ public:
 	explicit Neuron(std::size_t inputSize);
 	/// Feeds input to the neuron and obtains result
 	template<class InputIt>
-	T stimulate(InputIt first, InputIt last) const;
+	T stimulate(InputIt first) const;
+	/// Modifies bias and weights
+	template<class InputIt, class ForwardIt>
+	void nudge(InputIt first, T factor, ForwardIt out);
 	/// Generates bias and weights
 	template<class Generator>
 	void generateParameters(Generator gen);
@@ -71,24 +74,37 @@ Neuron<T>::Neuron(std::size_t inputSize)
 	: weights(inputSize) {}
 
 /**
-	Interprets the range `[first, last)` as neuron input and return the
-	resulting activation level. Internally, multiplies input by corresponding
-	weights and sums with bias.
-
-	The size of `[first, last)` must match exactly the input size expected
-	by the neuron, otherwise the behavior is undefined.
+	Interprets the range `[first, first + inputSize)` as neuron input and
+	return the resulting activation level. Internally, multiplies input by
+	corresponding weights and sums with bias.
 
 	@tparam     InputIt   Must meet the requirements of `InputIterator`
 	@tparam     OutputIt  Must meet the requirements of `OutputIterator`
 	@param[in]  first     The beginning of the input range
-	@param[in]  last      The end of the input range
 
 	@returns Activation level of the neuron
 */
 template<typename T>
 template<class InputIt>
-T Neuron<T>::stimulate(InputIt first, InputIt last) const {
-	return std::inner_product(first, last, weights.begin(), bias);
+T Neuron<T>::stimulate(InputIt first) const {
+	return std::inner_product(weights.begin(), weights.end(), first, bias);
+}
+
+/**
+	TODO
+*/
+template<typename T>
+template<class InputIt, class ForwardIt>
+void Neuron<T>::nudge(InputIt first, T factor, ForwardIt out) {
+	bias -= factor;
+	auto outputOperation = [=](T weight, T output) {
+		return output - weight * factor;
+	};
+	auto weightOperation = [=](T weight, T input) {
+		return weight - input * factor;
+	};
+	std::transform(weights.begin(), weights.end(), out, out, outputOperation);
+	std::transform(weights.begin(), weights.end(), first, weights.begin(), weightOperation);
 }
 
 /**
