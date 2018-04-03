@@ -62,6 +62,8 @@ public:
 	/// TODO
 	template<class InputIt1, class InputIt2, class ForwardIt1, class ForwardIt2>
 	void modify(const ActivationFunction<T>& activation, InputIt1 sums, InputIt2 expected, ForwardIt1 args, T step, ForwardIt2 out);
+	/// TODO
+	void apply();
 	/// Generates biases and weights of neurons
 	template<class Generator>
 	void generateParameters(Generator gen);
@@ -130,6 +132,15 @@ void NeuronGroup<T>::modify(const ActivationFunction<T>& activation, InputIt1 su
 		T factor = (activation(sum) - exp) * activation.derivative(sum);
 		neuron.nudge(args, factor * step, out);
 	}
+}
+
+/**
+	TODO
+*/
+template<typename T>
+void NeuronGroup<T>::apply() {
+	using namespace std::placeholders;
+	std::for_each(neurons.begin(), neurons.end(), std::bind(Neuron::apply, _1));
 }
 
 /**

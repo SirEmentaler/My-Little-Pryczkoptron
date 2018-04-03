@@ -52,15 +52,19 @@ public:
 	/// Feeds input to the neuron and obtains result
 	template<class InputIt>
 	T stimulate(InputIt first) const;
-	/// Modifies bias and weights
+	/// Determines modifications to apply to bias and weights
 	template<class InputIt, class ForwardIt>
 	void nudge(InputIt first, T factor, ForwardIt out);
+	/// Applies changes from nudge calls
+	void apply();
 	/// Generates bias and weights
 	template<class Generator>
 	void generateParameters(Generator gen);
 private:
 	T bias = T();
+	T biasDiff = T();
 	std::vector<T> weights;
+	std::vector<T> weightDiffs;
 };
 
 /**
@@ -71,7 +75,7 @@ private:
 */
 template<typename T>
 Neuron<T>::Neuron(std::size_t inputSize)
-	: weights(inputSize) {}
+	: weights(inputSize), weightDiffs(inputSize) {}
 
 /**
 	Interprets the range `[first, first + inputSize)` as neuron input and
@@ -96,7 +100,7 @@ T Neuron<T>::stimulate(InputIt first) const {
 template<typename T>
 template<class InputIt, class ForwardIt>
 void Neuron<T>::nudge(InputIt first, T factor, ForwardIt out) {
-	bias -= factor;
+	biasDiff -= factor;
 	auto outputOperation = [=](T weight, T output) {
 		return output - weight * factor;
 	};
@@ -104,7 +108,15 @@ void Neuron<T>::nudge(InputIt first, T factor, ForwardIt out) {
 		return weight - input * factor;
 	};
 	std::transform(weights.begin(), weights.end(), out, out, outputOperation);
-	std::transform(weights.begin(), weights.end(), first, weights.begin(), weightOperation);
+	std::transform(weightDiffs.begin(), weightDiffs.end(), first, weightDiffs.begin(), weightOperation);
+}
+
+template<typename T>
+void Neuron<T>::apply() {
+	bias += biasDiff;
+	biasDiff = T();
+	std::transform(weights.begin(), weights.end(), weightDiffs.begin(), weights.begin(), std::plus<T>());
+	std::fill(weightDiffs.begin(), weightDiffs.end(), T());
 }
 
 /**
@@ -118,8 +130,11 @@ void Neuron<T>::nudge(InputIt first, T factor, ForwardIt out) {
 template<typename T>
 template<class Generator>
 void Neuron<T>::generateParameters(Generator gen) {
-	bias = gen();
+	//bias = gen();
 	std::generate(weights.begin(), weights.end(), gen);
+	for (auto&& weight : weights) {
+		weight /= std::sqrt(weights.size());
+	}
 }
 
 }

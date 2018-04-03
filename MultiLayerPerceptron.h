@@ -63,6 +63,8 @@ public:
 	/// Trains neural network based on provided input data and expected output
 	template<class InputIt1, class InputIt2>
 	void train(InputIt1 first, InputIt2 expected, T step);
+	/// TODO
+	void apply();
 	/// Generates biases and weights of neurons
 	template<class Generator>
 	void generateParameters(Generator gen);
@@ -209,6 +211,13 @@ void MultiLayerPerceptron<T>::train(InputIt1 first, InputIt2 expected, T step) {
 			});
 			nudges = std::move(buffer);
 		}
+	}
+}
+
+template<typename T>
+void MultiLayerPerceptron<T>::apply() {
+	for (auto&& layer : layers) {
+		layer.group.apply();
 	}
 }
 
