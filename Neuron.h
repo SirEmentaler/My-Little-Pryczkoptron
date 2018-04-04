@@ -26,6 +26,7 @@
 #define NEURON_H_
 
 #include <algorithm>
+#include <cmath> //TODO
 #include <cstddef>
 #include <numeric>
 #include <vector>
@@ -132,6 +133,7 @@ void Neuron<T>::apply(T momentum) {
 template<typename T>
 template<class Generator>
 void Neuron<T>::generateParameters(Generator gen) {
+	//TODO
 	//bias = gen();
 	std::generate(weights.begin(), weights.end(), gen);
 	for (auto&& weight : weights) {
