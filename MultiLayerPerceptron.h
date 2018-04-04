@@ -138,14 +138,12 @@ void MultiLayerPerceptron<T>::test(ForwardIt first, OutputIt out) const {
 		std::vector<T> inter(layers.front().group.size());
 		layers.front().group.process(first, inter.begin());
 		using namespace std::placeholders;
-		auto transformation = std::bind(ActivationFunction<T>::operator(), layers.front().activation, _1);
-		std::transform(inter.begin(), inter.end(), inter.begin(), transformation);
+		std::transform(inter.begin(), inter.end(), inter.begin(), layers.front().activation);
 		auto operation = [&](const NeuronLayer<T>& layer) {
 			std::vector<T> buffer(layer.group.size());
 			layer.group.process(inter.begin(), buffer.begin());
 			using namespace std::placeholders;
-			auto transformation = std::bind(ActivationFunction<T>::operator(), layer.activation, _1);
-			std::transform(buffer.begin(), buffer.end(), buffer.begin(), transformation);
+			std::transform(buffer.begin(), buffer.end(), buffer.begin(), layer.activation);
 			inter = std::move(buffer);
 		};
 		std::for_each(std::next(layers.begin()), layers.end(), operation);
@@ -181,8 +179,7 @@ T MultiLayerPerceptron<T>::train(InputIt1 first, InputIt2 expected) {
 		layer.group.process(factors.begin(), buffer.begin());
 		sums.push_back(buffer);
 		using namespace std::placeholders;
-		auto transformation = std::bind(ActivationFunction<T>::operator(), layer.activation, _1);
-		std::transform(buffer.begin(), buffer.end(), buffer.begin(), transformation);
+		std::transform(buffer.begin(), buffer.end(), buffer.begin(), layer.activation);
 		factors = std::move(buffer);
 	};
 	std::for_each(layers.begin(), layers.end(), operation);
