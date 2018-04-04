@@ -4,13 +4,13 @@
 #include <random>
 #include <utility>
 #include "IdentityFunction.h"
-#include "LogisticFunction.h"
+#include "HyperbolicTangent.h"
 #include "MultiLayerPerceptron.h"
 #include "RandomNumberGenerator.h"
 
 int main() {
 	mlp::MultiLayerPerceptron<double> network(1, {
-		{64, mlp::LogisticFunction<double>()},
+		{64, mlp::HyperbolicTangent<double>()},
 		{1, mlp::IdentityFunction<double>()},
 	});
 	mlp::RandomNumberGenerator<double, std::mt19937_64> generator(-1.0, 1.0);
