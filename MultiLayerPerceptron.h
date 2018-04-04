@@ -62,7 +62,9 @@ public:
 	void test(ForwardIt first, OutputIt out) const;
 	/// Trains neural network based on provided input data and expected output
 	template<class InputIt1, class InputIt2>
-	void train(InputIt1 first, InputIt2 expected, T step);
+	void train(InputIt1 first, InputIt2 expected);
+	/// TODO
+	void apply(T momentum);
 	/// Generates biases and weights of neurons
 	template<class Generator>
 	void generateParameters(Generator gen);
@@ -165,50 +167,48 @@ void MultiLayerPerceptron<T>::test(ForwardIt first, OutputIt out) const {
 */
 template<typename T>
 template<class InputIt1, class InputIt2>
-void MultiLayerPerceptron<T>::train(InputIt1 first, InputIt2 expected, T step) {
+void MultiLayerPerceptron<T>::train(InputIt1 first, InputIt2 expected) {
 	if (size() != 0) {
-		// TODO
 		std::vector<std::vector<T>> sums;
 		std::vector<std::vector<T>> activeSums;
+		std::vector<T> factors(inputSize);
 		sums.reserve(size() + 1);
 		sums.emplace_back(inputSize);
-		activeSums.reserve(size() + 1);
-		activeSums.emplace_back(inputSize);
-		std::copy_n(first, inputSize, sums.front().begin());
-		std::copy_n(sums.front().begin(), inputSize, activeSums.front().begin());
+		activeSums.reserve(size());
+		std::copy_n(first, inputSize, factors.begin());
+		std::copy_n(factors.begin(), inputSize, sums.front().begin());
 		auto operation = [&](const NeuronLayer<T>& layer) {
+			activeSums.push_back(factors);
 			std::vector<T> buffer(layer.group.size());
-			layer.group.process(activeSums.back().begin(), buffer.begin());
-			sums.emplace_back(buffer);
+			layer.group.process(factors.begin(), buffer.begin());
+			sums.push_back(buffer);
 			using namespace std::placeholders;
 			auto transformation = std::bind(ActivationFunction<T>::operator(), layer.activation, _1);
 			std::transform(buffer.begin(), buffer.end(), buffer.begin(), transformation);
-			activeSums.emplace_back(std::move(buffer));
+			factors = std::move(buffer);
 		};
 		std::for_each(layers.begin(), layers.end(), operation);
 		auto sumIt = sums.rbegin();
-		auto layerIt = layers.rbegin();
 		auto activeSumIt = activeSums.rbegin();
-		auto& last = *sumIt++;
-		std::vector<T> nudges(sumIt->size());
-		layerIt->group.modify(*layerIt->activation, last.begin(), expected, sumIt->begin(), step, nudges.begin());
-		T layerSize = layerIt->group.size();
-		std::transform(nudges.begin(), nudges.end(), nudges.begin(), [=](T value) {
-			return value / layerSize;
-		});
-		for (++layerIt, ++activeSumIt; layerIt != layers.rend(); ++layerIt, ++activeSumIt) {
+		std::transform(factors.begin(), factors.end(), expected, factors.begin(), std::minus<T>());
+		auto backpropagation = [&](NeuronLayer<T>& layer) {
 			auto& last = *sumIt++;
-			std::vector<T> buffer(sumIt->size());
-			std::transform(nudges.begin(), nudges.end(), activeSumIt->begin(), nudges.begin(), [](T nudge, T sum) {
-				return nudge + sum;
+			auto& lastActive = *activeSumIt++;
+			std::transform(factors.begin(), factors.end(), last.begin(), factors.begin(), [&](T factor, T sum) {
+				return factor * layer.activation->derivative(sum);
 			});
-			layerIt->group.modify(*layerIt->activation, last.begin(), nudges.begin(), sumIt->begin(), step, nudges.begin());
-			T layerSize = layerIt->group.size();
-			std::transform(buffer.begin(), buffer.end(), buffer.begin(), [=](T value) {
-				return value / layerSize;
-			});
-			nudges = std::move(buffer);
-		}
+			std::vector<T> buffer(lastActive.size());
+			layer.group.modify(factors.begin(), lastActive.begin(), buffer.begin());
+			factors = std::move(buffer);
+		};
+		std::for_each(layers.rbegin(), layers.rend(), backpropagation);
+	}
+}
+
+template<typename T>
+void MultiLayerPerceptron<T>::apply(T momentum) {
+	for (auto&& layer : layers) {
+		layer.group.apply(momentum);
 	}
 }
 

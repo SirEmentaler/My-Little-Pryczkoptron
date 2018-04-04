@@ -60,8 +60,10 @@ public:
 	template<class ForwardIt, class OutputIt>
 	void process(ForwardIt first, OutputIt out) const;
 	/// TODO
-	template<class InputIt1, class InputIt2, class ForwardIt1, class ForwardIt2>
-	void modify(const ActivationFunction<T>& activation, InputIt1 sums, InputIt2 expected, ForwardIt1 args, T step, ForwardIt2 out);
+	template<class InputIt, class ForwardIt1, class ForwardIt2>
+	void modify(InputIt factors, ForwardIt1 args, ForwardIt2 out);
+	/// TODO
+	void apply(T momentum);
 	/// Generates biases and weights of neurons
 	template<class Generator>
 	void generateParameters(Generator gen);
@@ -121,15 +123,20 @@ void NeuronGroup<T>::process(ForwardIt first, OutputIt out) const {
 	TODO
 */
 template<typename T>
-template<class InputIt1, class InputIt2, class ForwardIt1, class ForwardIt2>
-// TODO: Take derivative argument instead of expected argument
-void NeuronGroup<T>::modify(const ActivationFunction<T>& activation, InputIt1 sums, InputIt2 expected, ForwardIt1 args, T step, ForwardIt2 out) {
+template<class InputIt, class ForwardIt1, class ForwardIt2>
+void NeuronGroup<T>::modify(InputIt factors, ForwardIt1 args, ForwardIt2 out) {
 	for (auto&& neuron : neurons) {
-		T sum = *sums++;
-		T exp = *expected++;
-		T factor = (activation(sum) - exp) * activation.derivative(sum);
-		neuron.nudge(args, factor * step, out);
+		neuron.nudge(args, *factors++, out);
 	}
+}
+
+/**
+	TODO
+*/
+template<typename T>
+void NeuronGroup<T>::apply(T momentum) {
+	using namespace std::placeholders;
+	std::for_each(neurons.begin(), neurons.end(), std::bind(Neuron::apply, _1, momentum));
 }
 
 /**
