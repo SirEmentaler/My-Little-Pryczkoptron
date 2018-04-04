@@ -49,7 +49,7 @@ public:
 /**
 	@param[in] x Function argument
 
-	@returns Function value @f$ f(x) = \frac{1}{1+\exp(-x)} @f$ .
+	@returns Function value @f$ f(x) = \frac{1}{1+\exp(-x)} @f$
 */
 template<typename T>
 T LogisticFunction<T>::f(T x) {
@@ -59,7 +59,7 @@ T LogisticFunction<T>::f(T x) {
 /**
 	@param[in] x Function argument
 
-	@returns Function value @f$ f(x) = \frac{\exp(x)}{(1+\exp(-x))^2} @f$ .
+	@returns Function value @f$ f(x) = \frac{\exp(x)}{(1+\exp(-x))^2} @f$
 */
 template<typename T>
 T LogisticFunction<T>::df(T x) {

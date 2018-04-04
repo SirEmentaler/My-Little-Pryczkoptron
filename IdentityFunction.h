@@ -47,7 +47,7 @@ public:
 /**
 	@param[in] x Function argument
 
-	@returns Function value @f$ f(x) = x @f$ .
+	@returns Function value @f$ f(x) = x @f$
 */
 template<typename T>
 T IdentityFunction<T>::f(T x) {
@@ -55,9 +55,7 @@ T IdentityFunction<T>::f(T x) {
 }
 
 /**
-	@param[in] Function argument
-
-	@returns Function value @f$ f^\prime(x) = 1 @f$ .
+	@returns Function value @f$ f^\prime(x) = 1 @f$
 */
 template<typename T>
 T IdentityFunction<T>::df(T) {
