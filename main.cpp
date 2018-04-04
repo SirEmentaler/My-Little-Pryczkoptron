@@ -21,7 +21,7 @@ int main() {
 	for (std::pair<double, double> p; in >> p.first >> p.second;) {
 		input.push_back(p);
 	}
-	const int epochCount = 2000;
+	const int epochCount = 10000;
 	const int epochCountPercent = epochCount / 100;
 	for (int i = 0; i < epochCount; i++) {
 		if (i % epochCountPercent == 0) {
@@ -36,9 +36,9 @@ int main() {
 		}
 		std::shuffle(input.begin(), input.end(), shuffler);
 		for (const auto& p : input) {
-			network.train(&p.first, &p.second, 1e-4);
+			network.train(&p.first, &p.second);
+			network.apply(1e-2);
 		}
-		network.apply();
 	}
 	std::cout << "100%" << std::endl;
 	std::ofstream out("approximation_results_1.txt");
