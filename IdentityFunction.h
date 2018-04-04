@@ -36,11 +36,12 @@ namespace mlp {
 	@tparam T Must meet the requirements of `NumericType`
 */
 template<typename T>
-class IdentityFunction : public ActivationFunction<T> {
+class IdentityFunction {
+public:
 	/// Returns its argument
-	T operator()(T x) const override;
+	static T f(T x);
 	/// Returns 1
-	T derivative(T) const override;
+	static T df(T);
 };
 
 /**
@@ -49,7 +50,7 @@ class IdentityFunction : public ActivationFunction<T> {
 	@returns Function value @f$ f(x) = x @f$ .
 */
 template<typename T>
-T IdentityFunction<T>::operator()(T x) const {
+T IdentityFunction<T>::f(T x) {
 	return x;
 }
 
@@ -59,7 +60,7 @@ T IdentityFunction<T>::operator()(T x) const {
 	@returns Function value @f$ f^\prime(x) = 1 @f$ .
 */
 template<typename T>
-T IdentityFunction<T>::derivative(T) const {
+T IdentityFunction<T>::df(T) {
 	return T(1);
 }
 

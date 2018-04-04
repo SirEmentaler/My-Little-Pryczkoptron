@@ -28,7 +28,6 @@
 #include <algorithm>
 #include <cstddef>
 #include <functional>
-#include <tuple>
 #include <utility>
 #include <vector>
 #include "NeuronLayerSpecification.h"
@@ -62,7 +61,7 @@ public:
 	void test(ForwardIt first, OutputIt out) const;
 	/// Trains neural network based on provided input data and expected output
 	template<class InputIt1, class InputIt2>
-	void train(InputIt1 first, InputIt2 expected);
+	T train(InputIt1 first, InputIt2 expected);
 	/// TODO
 	void apply(T momentum);
 	/// Generates biases and weights of neurons
@@ -167,42 +166,42 @@ void MultiLayerPerceptron<T>::test(ForwardIt first, OutputIt out) const {
 */
 template<typename T>
 template<class InputIt1, class InputIt2>
-void MultiLayerPerceptron<T>::train(InputIt1 first, InputIt2 expected) {
-	if (size() != 0) {
-		std::vector<std::vector<T>> sums;
-		std::vector<std::vector<T>> activeSums;
-		std::vector<T> factors(inputSize);
-		sums.reserve(size() + 1);
-		sums.emplace_back(inputSize);
-		activeSums.reserve(size());
-		std::copy_n(first, inputSize, factors.begin());
-		std::copy_n(factors.begin(), inputSize, sums.front().begin());
-		auto operation = [&](const NeuronLayer<T>& layer) {
-			activeSums.push_back(factors);
-			std::vector<T> buffer(layer.group.size());
-			layer.group.process(factors.begin(), buffer.begin());
-			sums.push_back(buffer);
-			using namespace std::placeholders;
-			auto transformation = std::bind(ActivationFunction<T>::operator(), layer.activation, _1);
-			std::transform(buffer.begin(), buffer.end(), buffer.begin(), transformation);
-			factors = std::move(buffer);
-		};
-		std::for_each(layers.begin(), layers.end(), operation);
-		auto sumIt = sums.rbegin();
-		auto activeSumIt = activeSums.rbegin();
-		std::transform(factors.begin(), factors.end(), expected, factors.begin(), std::minus<T>());
-		auto backpropagation = [&](NeuronLayer<T>& layer) {
-			auto& last = *sumIt++;
-			auto& lastActive = *activeSumIt++;
-			std::transform(factors.begin(), factors.end(), last.begin(), factors.begin(), [&](T factor, T sum) {
-				return factor * layer.activation->derivative(sum);
-			});
-			std::vector<T> buffer(lastActive.size());
-			layer.group.modify(factors.begin(), lastActive.begin(), buffer.begin());
-			factors = std::move(buffer);
-		};
-		std::for_each(layers.rbegin(), layers.rend(), backpropagation);
-	}
+T MultiLayerPerceptron<T>::train(InputIt1 first, InputIt2 expected) {
+	std::vector<std::vector<T>> sums;
+	std::vector<std::vector<T>> activeSums;
+	std::vector<T> factors(inputSize);
+	sums.reserve(size() + 1);
+	sums.emplace_back(inputSize);
+	activeSums.reserve(size());
+	std::copy_n(first, inputSize, factors.begin());
+	std::copy_n(factors.begin(), inputSize, sums.front().begin());
+	auto operation = [&](const NeuronLayer<T>& layer) {
+		activeSums.push_back(factors);
+		std::vector<T> buffer(layer.group.size());
+		layer.group.process(factors.begin(), buffer.begin());
+		sums.push_back(buffer);
+		using namespace std::placeholders;
+		auto transformation = std::bind(ActivationFunction<T>::operator(), layer.activation, _1);
+		std::transform(buffer.begin(), buffer.end(), buffer.begin(), transformation);
+		factors = std::move(buffer);
+	};
+	std::for_each(layers.begin(), layers.end(), operation);
+	auto sumIt = sums.rbegin();
+	auto activeSumIt = activeSums.rbegin();
+	std::transform(factors.begin(), factors.end(), expected, factors.begin(), std::minus<T>());
+	T result = std::inner_product(factors.begin(), factors.end(), factors.begin(), T());
+	auto backpropagation = [&](NeuronLayer<T>& layer) {
+		auto& last = *sumIt++;
+		auto& lastActive = *activeSumIt++;
+		std::transform(factors.begin(), factors.end(), last.begin(), factors.begin(), [&](T factor, T sum) {
+			return factor * layer.activation.derivative(sum);
+		});
+		std::vector<T> buffer(lastActive.size());
+		layer.group.modify(factors.begin(), lastActive.begin(), buffer.begin());
+		factors = std::move(buffer);
+	};
+	std::for_each(layers.rbegin(), layers.rend(), backpropagation);
+	return result;
 }
 
 template<typename T>

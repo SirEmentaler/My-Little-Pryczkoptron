@@ -26,7 +26,6 @@
 #define NEURON_LAYER_SPECIFICATION_H_
 
 #include <cstddef>
-#include <memory>
 #include "ActivationFunction.h"
 
 namespace mlp {
@@ -47,7 +46,7 @@ struct NeuronLayerSpecification {
 	/// Size of the layer, i.e. its number of neurons
 	std::size_t size;
 	/// Activation function of the layer
-	std::shared_ptr<ActivationFunction<T>> activation;
+	ActivationFunction<T> activation;
 };
 
 }

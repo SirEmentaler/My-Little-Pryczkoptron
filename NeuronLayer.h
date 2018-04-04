@@ -46,7 +46,7 @@ struct NeuronLayer {
 	/// The group of neurons
 	NeuronGroup<T> group;
 	/// The activation function
-	std::shared_ptr<ActivationFunction<T>> activation;
+	ActivationFunction<T> activation;
 };
 
 }

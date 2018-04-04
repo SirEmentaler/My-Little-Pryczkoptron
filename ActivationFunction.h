@@ -27,7 +27,7 @@
 
 namespace mlp {
 
-/// Template abstract class representing an activation function with derivative
+/// Lightweight template class representing an activation function
 /**
 	An activation function is used by neuron layers.
 
@@ -38,13 +38,58 @@ class ActivationFunction {
 public:
 	/// Data type the class operates on
 	using ValueType = T;
-	/// Default virtual destructor
-	virtual ~ActivationFunction() = default;
+	/// Function type
+	using FunctionType = T(*)(T);
+	/// Default constructor
+	ActivationFunction() = default;
+	/// Constructor from wrapped function
+template<class WrappedFunction>
+	ActivationFunction(const WrappedFunction&);
+	/// Assigns underlying function
+	template<class WrappedFunction>
+	T operator=(const WrappedFunction&);
 	/// Calls the function and returns a value
-	virtual T operator()(T) const = 0;
+	T operator()(T x) const;
 	/// Calls the derivative of the function and returns a value
-	virtual T derivative(T) const = 0;
+	T derivative(T x) const;
+private:
+	FunctionType f;
+	FunctionType df;
 };
+
+/**
+	TODO
+*/
+template<typename T>
+template<class WrappedFunction>
+ActivationFunction<T>::ActivationFunction(const WrappedFunction&)
+	: f(WrappedFunction::f), df(WrappedFunction::df) {}
+
+/**
+	TODO
+*/
+template<typename T>
+template<class WrappedFunction>
+T ActivationFunction<T>::operator=(const WrappedFunction&) {
+	f = WrappedFunction::f;
+	df = WrappedFunction::df;
+}
+
+/**
+	TODO
+*/
+template<typename T>
+T ActivationFunction<T>::operator()(T x) const {
+	return f(x);
+}
+
+/**
+	TODO
+*/
+template<typename T>
+T ActivationFunction<T>::derivative(T x) const {
+	return df(x);
+}
 
 }
 

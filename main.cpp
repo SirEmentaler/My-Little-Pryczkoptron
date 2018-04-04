@@ -10,8 +10,8 @@
 
 int main() {
 	mlp::MultiLayerPerceptron<double> network(1, {
-		{64, std::make_shared<mlp::LogisticFunction<double>>()},
-		{1, std::make_shared<mlp::IdentityFunction<double>>()},
+		{64, mlp::LogisticFunction<double>()},
+		{1, mlp::IdentityFunction<double>()},
 	});
 	mlp::RandomNumberGenerator<double, std::mt19937_64> generator(-1.0, 1.0);
 	network.generateParameters(generator);
@@ -24,20 +24,14 @@ int main() {
 	const int epochCount = 10000;
 	const int epochCountPercent = epochCount / 100;
 	for (int i = 0; i < epochCount; i++) {
-		if (i % epochCountPercent == 0) {
-			double error = 0.0;
-			for (const auto& p : input) {
-				double output;
-				network.test(&p.first, &output);
-				double diff = output - p.second;
-				error += diff * diff;
-			}
-			std::cout << (i / epochCountPercent) << '%' << " - error is " << error << std::endl;
-		}
+		double error = 0.0;
 		std::shuffle(input.begin(), input.end(), shuffler);
 		for (const auto& p : input) {
-			network.train(&p.first, &p.second);
-			network.apply(1e-2);
+			error += network.train(&p.first, &p.second);
+		}
+		network.apply(5e-4);
+		if (i % epochCountPercent == 0) {
+			std::cout << (i / epochCountPercent) << '%' << " - error is " << error << std::endl;
 		}
 	}
 	std::cout << "100%" << std::endl;

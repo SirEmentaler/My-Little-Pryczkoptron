@@ -38,11 +38,12 @@ namespace mlp {
 	          `x` of type `T`, the expression `std::exp(x)` must be well formed
 */
 template<typename T>
-class LogisticFunction : public ActivationFunction<T> {
+class LogisticFunction {
+public:
 	/// Returns logistic function value
-	T operator()(T x) const override;
+	static T f(T x);
 	/// Returns logistic function derivative value
-	T derivative(T x) const override;
+	static T df(T x);
 };
 
 /**
@@ -51,7 +52,7 @@ class LogisticFunction : public ActivationFunction<T> {
 	@returns Function value @f$ f(x) = \frac{1}{1+\exp(-x)} @f$ .
 */
 template<typename T>
-T LogisticFunction<T>::operator()(T x) const {
+T LogisticFunction<T>::f(T x) {
 	return T(1) / (T(1) + std::exp(-x));
 }
 
@@ -61,7 +62,7 @@ T LogisticFunction<T>::operator()(T x) const {
 	@returns Function value @f$ f(x) = \frac{\exp(x)}{(1+\exp(-x))^2} @f$ .
 */
 template<typename T>
-T LogisticFunction<T>::derivative(T x) const {
+T LogisticFunction<T>::df(T x) {
 	double e = std::exp(x);
 	double e1 = e + T(1);
 	return e / (e1 * e1);
