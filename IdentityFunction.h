@@ -39,9 +39,9 @@ template<typename T>
 class IdentityFunction {
 public:
 	/// Returns its argument
-	static T f(T x);
+	constexpr static T f(T x);
 	/// Returns 1
-	static T df(T);
+	constexpr static T df(T);
 };
 
 /**
@@ -50,7 +50,7 @@ public:
 	@returns Function value @f$ f(x) = x @f$
 */
 template<typename T>
-T IdentityFunction<T>::f(T x) {
+constexpr T IdentityFunction<T>::f(T x) {
 	return x;
 }
 
@@ -58,7 +58,7 @@ T IdentityFunction<T>::f(T x) {
 	@returns Function value @f$ f^\prime(x) = 1 @f$
 */
 template<typename T>
-T IdentityFunction<T>::df(T) {
+constexpr T IdentityFunction<T>::df(T) {
 	return T(1);
 }
 

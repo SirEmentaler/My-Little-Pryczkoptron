@@ -42,16 +42,16 @@ template<typename T>
 class HyperbolicTangent {
 public:
 	/// Returns hyperbolic tangent value
-	static T f(T x);
+	constexpr static T f(T x);
 	/// Returns hyperbolic tangent derivative value
-	static T df(T x);
+	constexpr static T df(T x);
 };
 
 /**
 	TODO
 */
 template<typename T>
-T HyperbolicTangent<T>::f(T x) {
+constexpr T HyperbolicTangent<T>::f(T x) {
 	return std::tanh(x);
 }
 
@@ -59,7 +59,7 @@ T HyperbolicTangent<T>::f(T x) {
 	TODO
 */
 template<typename T>
-T HyperbolicTangent<T>::df(T x) {
+constexpr T HyperbolicTangent<T>::df(T x) {
 	T t = std::tanh(x);
 	return T(1) - t * t;
 }
