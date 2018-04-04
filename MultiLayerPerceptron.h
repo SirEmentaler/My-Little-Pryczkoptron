@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <functional>
+#include <initializer_list>
 #include <utility>
 #include <vector>
 #include "NeuronLayerSpecification.h"
@@ -101,8 +102,6 @@ MultiLayerPerceptron<T>::MultiLayerPerceptron(std::size_t inputSize, InputIt fir
 	and the second object specifies its activation function. The number of layers
 	created will be equal to `init.size()`.
 
-	@tparam    TupleType Must be tuple-like type with at least 3 elements
-	                     and support `std::get`
 	@param[in] inputSize Number of inputs of the perceptron
 	@param[in] init      Initializer list containing layer specifications
 */
@@ -137,12 +136,10 @@ void MultiLayerPerceptron<T>::test(ForwardIt first, OutputIt out) const {
 	} else {
 		std::vector<T> inter(layers.front().group.size());
 		layers.front().group.process(first, inter.begin());
-		using namespace std::placeholders;
 		std::transform(inter.begin(), inter.end(), inter.begin(), layers.front().activation);
 		auto operation = [&](const NeuronLayer<T>& layer) {
 			std::vector<T> buffer(layer.group.size());
 			layer.group.process(inter.begin(), buffer.begin());
-			using namespace std::placeholders;
 			std::transform(buffer.begin(), buffer.end(), buffer.begin(), layer.activation);
 			inter = std::move(buffer);
 		};
@@ -178,7 +175,6 @@ T MultiLayerPerceptron<T>::train(InputIt1 first, InputIt2 expected) {
 		std::vector<T> buffer(layer.group.size());
 		layer.group.process(factors.begin(), buffer.begin());
 		sums.push_back(buffer);
-		using namespace std::placeholders;
 		std::transform(buffer.begin(), buffer.end(), buffer.begin(), layer.activation);
 		factors = std::move(buffer);
 	};
