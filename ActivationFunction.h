@@ -43,7 +43,7 @@ public:
 	/// Default constructor
 	ActivationFunction() = default;
 	/// Constructor from wrapped function
-template<class WrappedFunction>
+	template<class WrappedFunction>
 	ActivationFunction(const WrappedFunction&);
 	/// Assigns underlying function
 	template<class WrappedFunction>
