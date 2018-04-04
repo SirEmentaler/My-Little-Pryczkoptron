@@ -29,7 +29,6 @@
 #include <cstddef>
 #include <functional>
 #include <vector>
-#include "ActivationFunction.h"
 #include "Neuron.h"
 
 namespace mlp {
