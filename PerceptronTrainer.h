@@ -58,10 +58,10 @@ private:
 	std::vector<std::pair<std::vector<T>, std::vector<T>>> dataSet;
 	std::size_t inputSize;
 	std::size_t outputSize;
-	std::size_t maxEpochs;
-	T errorThreshold;
-	T learningRate;
-	T momentum;
+	std::size_t maxEpochs = 0;
+	T errorThreshold = T();
+	T learningRate = T();
+	T momentum = T();
 };
 
 /**
