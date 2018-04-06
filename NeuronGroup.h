@@ -62,7 +62,7 @@ public:
 	template<class InputIt, class ForwardIt1, class ForwardIt2>
 	void modify(InputIt factors, ForwardIt1 args, ForwardIt2 out);
 	/// TODO
-	void apply(T momentum);
+	void apply(T rate, T momentum);
 	/// Generates biases and weights of neurons
 	template<class Generator>
 	void generateParameters(Generator gen);
@@ -133,9 +133,9 @@ void NeuronGroup<T>::modify(InputIt factors, ForwardIt1 args, ForwardIt2 out) {
 	TODO
 */
 template<typename T>
-void NeuronGroup<T>::apply(T momentum) {
+void NeuronGroup<T>::apply(T rate, T momentum) {
 	using namespace std::placeholders;
-	std::for_each(neurons.begin(), neurons.end(), std::bind(Neuron::apply, _1, momentum));
+	std::for_each(neurons.begin(), neurons.end(), std::bind(Neuron::apply, _1, rate, momentum));
 }
 
 /**

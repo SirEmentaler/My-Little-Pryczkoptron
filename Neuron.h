@@ -57,7 +57,7 @@ public:
 	template<class InputIt, class ForwardIt>
 	void nudge(InputIt first, T factor, ForwardIt out);
 	/// Applies changes from nudge calls
-	void apply(T momentum);
+	void apply(T rate, T momentum);
 	/// Generates bias and weights
 	template<class Generator>
 	void generateParameters(Generator gen);
@@ -113,13 +113,15 @@ void Neuron<T>::nudge(InputIt first, T factor, ForwardIt out) {
 }
 
 template<typename T>
-void Neuron<T>::apply(T momentum) {
-	bias += biasDiff * momentum;
-	biasDiff = T();
+void Neuron<T>::apply(T rate, T momentum) {
+	bias += biasDiff * rate;
+	biasDiff *= momentum;
 	std::transform(weights.begin(), weights.end(), weightDiffs.begin(), weights.begin(), [=](T weight, T diff) {
-		return weight += diff * momentum;
+		return weight += diff * rate;
 	});
-	std::fill(weightDiffs.begin(), weightDiffs.end(), T());
+	std::transform(weightDiffs.begin(), weightDiffs.end(), weightDiffs.begin(), [=](T diff) {
+		return diff * momentum;
+	});
 }
 
 /**

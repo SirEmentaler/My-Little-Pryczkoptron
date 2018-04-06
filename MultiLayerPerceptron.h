@@ -64,7 +64,7 @@ public:
 	template<class InputIt1, class InputIt2>
 	T train(InputIt1 first, InputIt2 expected);
 	/// TODO
-	void apply(T momentum);
+	void apply(T rate, T momentum);
 	/// Generates biases and weights of neurons
 	template<class Generator>
 	void generateParameters(Generator gen);
@@ -198,9 +198,9 @@ T MultiLayerPerceptron<T>::train(InputIt1 first, InputIt2 expected) {
 }
 
 template<typename T>
-void MultiLayerPerceptron<T>::apply(T momentum) {
+void MultiLayerPerceptron<T>::apply(T rate, T momentum) {
 	for (auto&& layer : layers) {
-		layer.group.apply(momentum);
+		layer.group.apply(rate, momentum);
 	}
 }
 
