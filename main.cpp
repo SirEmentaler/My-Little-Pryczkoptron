@@ -21,17 +21,17 @@ int main() {
 		trainer.addTest(&input, &output);
 	}
 	trainer.train(network);
-	std::vector<std::pair<double, double>> input;
-	std::ifstream in("approximation_test.txt");
-	for (std::pair<double, double> p; in >> p.first >> p.second;) {
-		input.push_back(p);
+	std::vector<std::pair<double, double>> data;
+	std::ifstream testData("approximation_test.txt");
+	for (double input, output; testData >> input >> output;) {
+		data.emplace_back(input, output);
 	}
 	std::ofstream out("approximation_results_1.txt");
 	out << "Argument\tExpected\tObtained\n";
-	for (const auto& p : input) {
+	for (const auto& inout : data) {
 		double output;
-		network.test(&p.first, &output);
-		out << p.first << '\t' << p.second << '\t' << output << '\n';
+		network.test(&inout.first, &output);
+		out << inout.first << '\t' << inout.second << '\t' << output << '\n';
 	}
 	return 0;
 }
