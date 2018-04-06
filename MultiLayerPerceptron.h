@@ -65,9 +65,12 @@ public:
 	T train(InputIt1 first, InputIt2 expected);
 	/// TODO
 	void apply(T rate, T momentum);
-	/// Generates biases and weights of neurons
+	/// Generates biases of neurons
 	template<class Generator>
-	void generateParameters(Generator gen);
+	void generateBiases(Generator gen);
+	/// Generates weights of neurons
+	template<class Generator>
+	void generateWeights(Generator gen);
 private:
 	template<class InputIt>
 	void construct(std::size_t inputSize, InputIt first, InputIt last);
@@ -205,7 +208,7 @@ void MultiLayerPerceptron<T>::apply(T rate, T momentum) {
 }
 
 /**
-	Fills bias and weight values of all neurons in the network with
+	Fills bias values of all neurons in the network with
 	outputs of function `gen`.
 
 	@tparam    Generator An invokable type with signature equivalent to
@@ -215,9 +218,26 @@ void MultiLayerPerceptron<T>::apply(T rate, T momentum) {
 */
 template<typename T>
 template<class Generator>
-void MultiLayerPerceptron<T>::generateParameters(Generator gen) {
+void MultiLayerPerceptron<T>::generateBiases(Generator gen) {
 	for (auto&& layer : layers) {
-		layer.group.generateParameters(gen);
+		layer.group.generateBiases(gen);
+	}
+}
+
+/**
+	Fills weight values of all neurons in the network with
+	outputs of function `gen`.
+
+	@tparam    Generator An invokable type with signature equivalent to
+	                     `Ret f()`, such that a value of type `Ret` may
+	                     be assigned to a variable of type `T`
+	@param[in] gen       The generator function
+*/
+template<typename T>
+template<class Generator>
+void MultiLayerPerceptron<T>::generateWeights(Generator gen) {
+	for (auto&& layer : layers) {
+		layer.group.generateWeights(gen);
 	}
 }
 

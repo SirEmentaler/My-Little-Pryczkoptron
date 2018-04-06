@@ -63,9 +63,12 @@ public:
 	void modify(InputIt factors, ForwardIt1 args, ForwardIt2 out);
 	/// TODO
 	void apply(T rate, T momentum);
-	/// Generates biases and weights of neurons
+	/// Generates biases of neurons
 	template<class Generator>
-	void generateParameters(Generator gen);
+	void generateBiases(Generator gen);
+	/// Generates weights of neurons
+	template<class Generator>
+	void generateWeights(Generator gen);
 private:
 	std::size_t inSize;
 	std::vector<Neuron> neurons;
@@ -139,6 +142,23 @@ void NeuronGroup<T>::apply(T rate, T momentum) {
 }
 
 /**
+	Fills bias values of all neurons in the layer with
+	outputs of function `gen`.
+
+	@tparam    Generator An invokable type with signature equivalent to
+	                     `Ret f()`, such that a value of type `Ret` may
+	                     be assigned to a variable of type `T`
+	@param[in] gen       The generator function
+*/
+template<typename T>
+template<class Generator>
+void NeuronGroup<T>::generateBiases(Generator gen) {
+	for (auto&& neuron : neurons) {
+		neuron.setBias(gen());
+	}
+}
+
+/**
 	Fills bias and weight values of all neurons in the layer with
 	outputs of function `gen`.
 
@@ -149,9 +169,9 @@ void NeuronGroup<T>::apply(T rate, T momentum) {
 */
 template<typename T>
 template<class Generator>
-void NeuronGroup<T>::generateParameters(Generator gen) {
+void NeuronGroup<T>::generateWeights(Generator gen) {
 	using namespace std::placeholders;
-	auto generate = &Neuron::template generateParameters<Generator>;
+	auto generate = &Neuron::template generateWeights<Generator>;
 	auto operation = std::bind(generate, _1, gen);
 	std::for_each(neurons.begin(), neurons.end(), operation);
 }

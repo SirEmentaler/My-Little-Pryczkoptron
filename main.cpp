@@ -14,14 +14,14 @@ int main() {
 		{1, mlp::IdentityFunction<double>()},
 	});
 	mlp::RandomNumberGenerator<double, std::mt19937_64> generator(-1.0, 1.0);
-	network.generateParameters(generator);
+	network.generateWeights(generator);
 	{
 		std::vector<std::pair<double, double>> input;
 		std::ifstream in("approximation_train_1.txt");
 		for (std::pair<double, double> p; in >> p.first >> p.second;) {
 			input.push_back(p);
 		}
-		const int epochCount = 100000;
+		const int epochCount = 1000;
 		const int epochCountPercent = epochCount / 100;
 		std::mt19937_64 shuffler;
 		for (int i = 0; i < epochCount; i++) {

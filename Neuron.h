@@ -26,7 +26,6 @@
 #define NEURON_H_
 
 #include <algorithm>
-#include <cmath> //TODO
 #include <cstddef>
 #include <numeric>
 #include <vector>
@@ -58,9 +57,11 @@ public:
 	void nudge(InputIt first, T factor, ForwardIt out);
 	/// Applies changes from nudge calls
 	void apply(T rate, T momentum);
-	/// Generates bias and weights
+	/// Sets bias
+	void setBias(T value);
+	/// Generates weights
 	template<class Generator>
-	void generateParameters(Generator gen);
+	void generateWeights(Generator gen);
 private:
 	T bias = T();
 	T biasDiff = T();
@@ -125,7 +126,7 @@ void Neuron<T>::apply(T rate, T momentum) {
 }
 
 /**
-	Fills bias and weight values of the neuron with outputs of function `gen`.
+	Fills weight values of the neuron with outputs of function `gen`.
 
 	@tparam    Generator An invokable type with signature equivalent to
 	                     `Ret f()`, such that a value of type `Ret` may
@@ -134,13 +135,18 @@ void Neuron<T>::apply(T rate, T momentum) {
 */
 template<typename T>
 template<class Generator>
-void Neuron<T>::generateParameters(Generator gen) {
-	//TODO
-	//bias = gen();
+void Neuron<T>::generateWeights(Generator gen) {
 	std::generate(weights.begin(), weights.end(), gen);
-	for (auto&& weight : weights) {
-		weight /= std::sqrt(weights.size());
-	}
+}
+
+/**
+	Sets bias of the neuron.
+
+	@param[in] value New bias value
+*/
+template<typename T>
+void Neuron<T>::setBias(T value) {
+	bias = value;
 }
 
 }
