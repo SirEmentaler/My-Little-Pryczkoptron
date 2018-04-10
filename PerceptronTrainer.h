@@ -37,7 +37,7 @@ namespace mlp {
 
 /// Template class for training neural networks
 /**
-	TODO
+	TODO: Detailed description
 */
 template<typename T>
 class PerceptronTrainer {
@@ -72,14 +72,14 @@ private:
 };
 
 /**
-	TODO
+	TODO: Detailed description
 */
 template<typename T>
 PerceptronTrainer<T>::PerceptronTrainer(std::size_t inputSize, std::size_t outputSize)
 	: inputSize(inputSize), outputSize(outputSize) {}
 
 /**
-	TODO
+	TODO: Detailed description
 */
 template<typename T>
 template<class Perceptron>
@@ -99,7 +99,7 @@ void PerceptronTrainer<T>::train(Perceptron& perceptron) const {
 }
 
 /**
-	TODO
+	TODO: Detailed description
 */
 template<typename T>
 template<class InputIt1, class InputIt2>

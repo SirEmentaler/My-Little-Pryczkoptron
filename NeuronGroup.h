@@ -122,7 +122,12 @@ void NeuronGroup<T>::process(ForwardIt first, OutputIt out) const {
 }
 
 /**
-	TODO
+	@tparam     InputIt    Must meet the requirements of `InputIterator`
+	@tparam     ForwardIt1 Must meet the requirements of `ForwardIterator`
+	@tparam     ForwardIt2 Must meet the requirements of `ForwardIterator`
+	@param[in]  factors    Common factors of respective neurons
+	@param[in]  args       The beginning of the input range
+	@param[out] out        The beginning of the output range
 */
 template<typename T>
 template<class InputIt, class ForwardIt1, class ForwardIt2>
