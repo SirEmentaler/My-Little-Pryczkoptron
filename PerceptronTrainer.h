@@ -51,6 +51,8 @@ public:
 	/// TODO
 	void setErrorThreshold(T value) {errorThreshold = value;}
 	/// TODO
+	void setInitialWeightRange(T value) {initialWeightRange = value;}
+	/// TODO
 	void setLearningRate(T value) {learningRate = value;}
 	/// TODO
 	void setMomentum(T value) {momentum = value;}
@@ -60,6 +62,7 @@ private:
 	std::size_t outputSize;
 	std::size_t maxEpochs = 0;
 	T errorThreshold = T();
+	T initialWeightRange = T();
 	T learningRate = T();
 	T momentum = T();
 };
@@ -78,7 +81,7 @@ template<typename T>
 template<class Perceptron>
 void PerceptronTrainer<T>::train(Perceptron& perceptron) const {
 	double scaledThreshold = errorThreshold * dataSet.size();
-	RandomNumberGenerator<T, std::mt19937_64> generator(-1.0, 1.0);
+	RandomNumberGenerator<T, std::mt19937_64> generator(-initialWeightRange, initialWeightRange);
 	perceptron.generateWeights(generator);
 	for (std::size_t i = maxEpochs; i--;) {
 		T error = T();
