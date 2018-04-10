@@ -29,16 +29,17 @@ namespace mlp {
 
 /// Lightweight template class representing an activation function
 /**
-	An activation function is used by neuron layers.
+	An activation function object is a pair of function pointers representing
+	a base function and its derivative.
 
-	@tparam T Any copyable type
+	@tparam T Value type of the function; any copyable type
 */
 template<typename T>
 class ActivationFunction {
 public:
 	/// Data type the class operates on
 	using ValueType = T;
-	/// Function type
+	/// Function pointer type
 	using FunctionType = T(*)(T);
 	/// Default constructor
 	ActivationFunction() = default;
@@ -58,7 +59,13 @@ private:
 };
 
 /**
-	TODO
+	Constructs an object wrapping static functions of class `WrappedFunction`.
+	`WrappedFunction::f` is used to initialize the base function whereas
+	`WrappedFunction::df` initializes the derivate. The actual argument value
+	is unused.
+
+	@tparam WrappedFunction A class type with static members `f` and `df` of
+	                        type assignable to `FunctionType`
 */
 template<typename T>
 template<class WrappedFunction>
@@ -66,7 +73,12 @@ ActivationFunction<T>::ActivationFunction(const WrappedFunction&)
 	: f(WrappedFunction::f), df(WrappedFunction::df) {}
 
 /**
-	TODO
+	Wraps static functions of class `WrappedFunction`. `WrappedFunction::f` is
+	assigned to the base function whereas `WrappedFunction::df` is assigned to
+	the derivate. The actual argument value is unused.
+
+	@tparam WrappedFunction A class type with static members `f` and `df` of
+	                        type assignable to `FunctionType`
 */
 template<typename T>
 template<class WrappedFunction>
@@ -76,7 +88,13 @@ T ActivationFunction<T>::operator=(const WrappedFunction&) {
 }
 
 /**
-	TODO
+	Calls the base function. If the object does not identify a valid function,
+	such as if it was default-constructed and never assigned to, the behavior
+	is undefined.
+
+	@param x Function argument
+
+	@returns Function value in `x`
 */
 template<typename T>
 T ActivationFunction<T>::operator()(T x) const {
@@ -84,7 +102,13 @@ T ActivationFunction<T>::operator()(T x) const {
 }
 
 /**
-	TODO
+	Calls the derivative. If the object does not identify a valid function,
+	such as if it was default-constructed and never assigned to, the behavior
+	is undefined.
+
+	@param x Derivative argument
+
+	@returns Derivative value in `x`
 */
 template<typename T>
 T ActivationFunction<T>::derivative(T x) const {

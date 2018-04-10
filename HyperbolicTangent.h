@@ -30,9 +30,9 @@
 
 namespace mlp {
 
-/// Template class representing a sigmoid activation function
+/// Template class representing a hyperbolic tangent activation function
 /**
-	TODO
+	Activation function @f$ f(x) = \tanh x @f$ .
 
 	@tparam T Must meet the requirements of `NumericType` and for a variable
 	          `x` of type `T`, the expression `std::tanh(x)` must be well
@@ -48,7 +48,9 @@ public:
 };
 
 /**
-	TODO
+	@param[in] x Function argument
+
+	@returns Function value @f$ f(x) = \tanh{x} @f$
 */
 template<typename T>
 constexpr T HyperbolicTangent<T>::f(T x) {
@@ -56,7 +58,9 @@ constexpr T HyperbolicTangent<T>::f(T x) {
 }
 
 /**
-	TODO
+	@param[in] x Derivative argument
+
+	@returns Derivative value @f$ f^\prime(x) = 1-\tanh^2{x} @f$
 */
 template<typename T>
 constexpr T HyperbolicTangent<T>::df(T x) {

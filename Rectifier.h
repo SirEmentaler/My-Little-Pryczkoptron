@@ -25,29 +25,33 @@
 #ifndef RECTIFIER_H_
 #define RECTIFIER_H_
 
+#include <algorithm>
+#include <cmath>
 #include "ActivationFunction.h"
 
 namespace mlp {
 
-/// Template class representing a linear activation function
+/// Template class representing a rectifier activation function
 /**
-	Activation function @f$ f(x) = x^+ @f$ .
+	Activation function @f$ f(x) = x^+ = \max(0,x) @f$ .
 
-	@tparam T Must meet the requirements of `NumericType`
+	@tparam T Must meet the requirements of `NumericType` and for a variable
+	          `x` of type `T`, the expression `std::signbit(x)` must be well
+	          formed
 */
 template<typename T>
 class Rectifier {
 public:
-	/// TODO
+	/// Returns rectifier function value
 	constexpr static T f(T x);
-	/// TODO
-	constexpr static T df(T);
+	/// Returns rectifier derivative value
+	constexpr static T df(T x);
 };
 
 /**
 	@param[in] x Function argument
 
-	@returns Function value @f$ f(x) = x^+ @f$
+	@returns Function value @f$ f(x) = x^+ = \max(0,x) @f$
 */
 template<typename T>
 constexpr T Rectifier<T>::f(T x) {
@@ -55,11 +59,17 @@ constexpr T Rectifier<T>::f(T x) {
 }
 
 /**
-	TODO
+	The result is unspecified if `x == 0` but guaranteed to be within the
+	range `[0, 1]`.
+
+	@param[in] x Derivative argument
+
+	@returns Derivative value @f$ f^\prime(x) = \begin{cases} 0, & x<0 \\ 1,
+	         & x>0 \\ \text{unspecified}, & x=0 \end{cases} @f$
 */
 template<typename T>
 constexpr T Rectifier<T>::df(T x) {
-	return x < T() ? T() : T(1);
+	return std::signbit(x) ? T() : T(1);
 }
 
 }

@@ -55,7 +55,7 @@ constexpr T IdentityFunction<T>::f(T x) {
 }
 
 /**
-	@returns Function value @f$ f^\prime(x) = 1 @f$
+	@returns Derivative value @f$ f^\prime(x) = 1 @f$
 */
 template<typename T>
 constexpr T IdentityFunction<T>::df(T) {

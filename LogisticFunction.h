@@ -32,7 +32,7 @@ namespace mlp {
 
 /// Template class representing a sigmoid activation function
 /**
-	Activation function @f$ f(x) = \frac{1}{1+\exp(-x)} @f$ .
+	Activation function @f$ f(x) = \frac{1}{1+e^{-x}} @f$ .
 
 	@tparam T Must meet the requirements of `NumericType` and for a variable
 	          `x` of type `T`, the expression `std::exp(x)` must be well formed
@@ -49,7 +49,7 @@ public:
 /**
 	@param[in] x Function argument
 
-	@returns Function value @f$ f(x) = \frac{1}{1+\exp(-x)} @f$
+	@returns Function value @f$ f(x) = \frac{1}{1+e^{-x}} @f$
 */
 template<typename T>
 constexpr T LogisticFunction<T>::f(T x) {
@@ -57,9 +57,9 @@ constexpr T LogisticFunction<T>::f(T x) {
 }
 
 /**
-	@param[in] x Function argument
+	@param[in] x Derivative argument
 
-	@returns Function value @f$ f(x) = \frac{\exp(x)}{(1+\exp(-x))^2} @f$
+	@returns Derivative value @f$ f^\prime(x) = \frac{e^x}{(1+e^x)^2} @f$
 */
 template<typename T>
 constexpr T LogisticFunction<T>::df(T x) {
