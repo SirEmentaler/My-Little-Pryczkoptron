@@ -58,10 +58,10 @@ public:
 	/// Produces output based on provided input data
 	template<class ForwardIt, class OutputIt>
 	void process(ForwardIt first, OutputIt out) const;
-	/// TODO
+	/// Determines changes to biases and weights
 	template<class InputIt, class ForwardIt1, class ForwardIt2>
 	void modify(InputIt factors, ForwardIt1 args, ForwardIt2 out);
-	/// TODO
+	/// Applies changes to biases and weights
 	void apply(T rate, T momentum);
 	/// Generates biases of neurons
 	template<class Generator>
@@ -104,7 +104,7 @@ std::size_t NeuronGroup<T>::inputSize() const {
 
 /**
 	Interprets the range `[first, first + inputSize)` as neuron layer input
-	and forwards it to the neurons. The output of is then placed in the range
+	and forwards it to the neurons. The output is then placed in the range
 	beginning at `out`.
 
 	@tparam     ForwardIt Must meet the requirements of `ForwardIterator`
@@ -133,7 +133,8 @@ void NeuronGroup<T>::modify(InputIt factors, ForwardIt1 args, ForwardIt2 out) {
 }
 
 /**
-	TODO
+	@param[in] rate     Learning rate
+	@param[in] momentum Momentum
 */
 template<typename T>
 void NeuronGroup<T>::apply(T rate, T momentum) {

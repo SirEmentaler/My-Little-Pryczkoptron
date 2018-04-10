@@ -92,7 +92,7 @@ T ActivationFunction<T>::operator=(const WrappedFunction&) {
 	such as if it was default-constructed and never assigned to, the behavior
 	is undefined.
 
-	@param x Function argument
+	@param[in] x Function argument
 
 	@returns Function value in `x`
 */
@@ -106,7 +106,7 @@ T ActivationFunction<T>::operator()(T x) const {
 	such as if it was default-constructed and never assigned to, the behavior
 	is undefined.
 
-	@param x Derivative argument
+	@param[in] x Derivative argument
 
 	@returns Derivative value in `x`
 */

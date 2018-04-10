@@ -35,26 +35,30 @@
 
 namespace mlp {
 
+/// Template class for training neural networks
+/**
+	TODO
+*/
 template<typename T>
 class PerceptronTrainer {
 public:
-	/// TODO
+	/// Constructs the trainer
 	PerceptronTrainer(std::size_t inputSize, std::size_t outputSize);
-	/// TODO
+	/// Runs training on a perceptron
 	template<class Perceptron>
 	void train(Perceptron& perceptron) const;
-	/// TODO
+	/// Adds a new training test case
 	template<class InputIt1, class InputIt2>
 	void addTest(InputIt1 inFirst, InputIt2 outFirst);
-	/// TODO
+	/// Sets limit of training iterations
 	void setMaxEpochs(std::size_t value) {maxEpochs = value;}
-	/// TODO
+	/// Sets acceptable average error upon reaching which the training stops
 	void setErrorThreshold(T value) {errorThreshold = value;}
-	/// TODO
+	/// Sets weight range to `[-value, value]`
 	void setInitialWeightRange(T value) {initialWeightRange = value;}
-	/// TODO
+	/// Sets learning rate
 	void setLearningRate(T value) {learningRate = value;}
-	/// TODO
+	/// Sets momentum
 	void setMomentum(T value) {momentum = value;}
 private:
 	std::vector<std::pair<std::vector<T>, std::vector<T>>> dataSet;

@@ -84,9 +84,9 @@ Neuron<T>::Neuron(std::size_t inputSize)
 	return the resulting activation level. Internally, multiplies input by
 	corresponding weights and sums with bias.
 
-	@tparam     InputIt   Must meet the requirements of `InputIterator`
-	@tparam     OutputIt  Must meet the requirements of `OutputIterator`
-	@param[in]  first     The beginning of the input range
+	@tparam    InputIt  Must meet the requirements of `InputIterator`
+	@tparam    OutputIt Must meet the requirements of `OutputIterator`
+	@param[in] first    The beginning of the input range
 
 	@returns Activation level of the neuron
 */
@@ -97,7 +97,11 @@ T Neuron<T>::stimulate(InputIt first) const {
 }
 
 /**
-	TODO
+	@tparam     InputIt   Must meet the requirements of `InputIterator`
+	@tparam     ForwardIt Must meet the requirements of `ForwardIterator`
+	@param[in]  first     The beginning of the input range
+	@param[in]  factor    A common factor calculated from the gradient
+	@param[out] out       The beginning of the output range
 */
 template<typename T>
 template<class InputIt, class ForwardIt>
@@ -113,6 +117,10 @@ void Neuron<T>::nudge(InputIt first, T factor, ForwardIt out) {
 	std::transform(weightDiffs.begin(), weightDiffs.end(), first, weightDiffs.begin(), weightOperation);
 }
 
+/**
+	@param[in] rate     Learning rate
+	@param[in] momentum Momentum
+*/
 template<typename T>
 void Neuron<T>::apply(T rate, T momentum) {
 	bias += biasDiff * rate;

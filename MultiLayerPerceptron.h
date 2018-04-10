@@ -63,7 +63,7 @@ public:
 	/// Trains neural network based on provided input data and expected output
 	template<class InputIt1, class InputIt2>
 	T train(InputIt1 first, InputIt2 expected);
-	/// TODO
+	/// Applies memorized changes to weights and biases.
 	void apply(T rate, T momentum);
 	/// Generates biases of neurons
 	template<class Generator>
@@ -155,9 +155,9 @@ void MultiLayerPerceptron<T>::test(ForwardIt first, OutputIt out) const {
 	Interprets the range `[first, first + inputSize)` as perceptron input and
 	feeds it to the neural network. Interprets the range
 	`[expected, expected + outputSize)` as expected results of the operation
-	and corrects weights and biases based on it.
+	and memorizes modifications to weights and biases based on it.
 
-	@tparam    InputIt1 Must meet the requirements of `ForwardIterator`
+	@tparam    InputIt1 Must meet the requirements of `InputIterator`
 	@tparam    InputIt2 Must meet the requirements of `InputIterator`
 	@param[in] first    The beginning of the input range
 	@param[in] expected The beginning of the expected output range
@@ -200,6 +200,10 @@ T MultiLayerPerceptron<T>::train(InputIt1 first, InputIt2 expected) {
 	return result;
 }
 
+/**
+	@param[in] rate     Learning rate
+	@param[in] momentum Momentum
+*/
 template<typename T>
 void MultiLayerPerceptron<T>::apply(T rate, T momentum) {
 	for (auto&& layer : layers) {
