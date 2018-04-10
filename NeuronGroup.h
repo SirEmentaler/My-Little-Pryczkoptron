@@ -128,7 +128,8 @@ template<typename T>
 template<class InputIt, class ForwardIt1, class ForwardIt2>
 void NeuronGroup<T>::modify(InputIt factors, ForwardIt1 args, ForwardIt2 out) {
 	for (auto&& neuron : neurons) {
-		neuron.nudge(args, *factors++, out);
+		neuron.nudge(args, *factors, out);
+		++factors;
 	}
 }
 
