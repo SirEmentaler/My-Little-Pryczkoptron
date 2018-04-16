@@ -145,7 +145,7 @@ void NeuronGroup<T>::modify(InputIt factors, ForwardIt1 args, ForwardIt2 out) {
 template<typename T>
 void NeuronGroup<T>::apply(T rate, T momentum) {
 	using namespace std::placeholders;
-	std::for_each(neurons.begin(), neurons.end(), std::bind(Neuron::apply, _1, rate, momentum));
+	std::for_each(neurons.begin(), neurons.end(), std::bind(&Neuron::apply, _1, rate, momentum));
 }
 
 /**
