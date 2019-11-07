@@ -1,2 +1,2 @@
-# My-Little-Pryczkoptron
+# Multilayer-Perceptron
 Simple multilayer perceptron (MLP) implementation
